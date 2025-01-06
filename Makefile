@@ -1,23 +1,27 @@
+CC = gcc
+TARGET = os-image
 C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
 HEADERS = $(wildcard kernel/*.h drivers/*.h)
-
-OBJ = ${C_SOURCES:.c=.o}
+OBJS = ${C_SOURCES:.c=.o}
 
 # Build all
-all: os-image
+all: $(TARGET) $(TARGET).iso
 
 # Run
 run: all
-	qemu-system-x86_64 -fda os-image -boot a
+	qemu-system-x86_64 -fda $(TARGET) -boot a
 
-os-image: boot/boot_sect.bin kernel/kernel.bin
-	cat $^ > os-image
+$(TARGET): boot/boot_sect.bin kernel/kernel.bin
+	cat $^ > $(TARGET)
 
-kernel/kernel.bin: kernel/kernel_entry.o ${OBJ}
+$(TARGET).iso: $(TARGET)
+	grub-mkrescue iso --output=$(TARGET).iso
+
+kernel/kernel.bin: kernel/kernel_entry.o ${OBJS}
 	ld -m elf_i386 -Ttext 0x1000 $^ --oformat binary -o $@
 
 %.o: %.c ${HEADERS}
-	gcc -m32 -ffreestanding -fno-pie -c $< -o $@
+	$(CC) -m32 -ffreestanding -fno-pie -nodefaultlibs -T boot/linker/linker.ld -c $< -o $@
 
 %.o: %.asm
 	nasm $< -f elf -o $@
@@ -26,5 +30,5 @@ kernel/kernel.bin: kernel/kernel_entry.o ${OBJ}
 	nasm $< -f bin -o $@
 
 clean:
-	rm -fr *.bin *.o os-image
+	rm -fr *.bin *.o $(TARGET) $(TARGET).iso
 	rm -fr kernel/*.o kernel/*.bin boot/*.bin drivers/*.o

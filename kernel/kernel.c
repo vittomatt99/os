@@ -20,9 +20,26 @@ void print_char(char c, int row, int col, char attribute) {
     video_memory[index] = (attribute << 8) | c;
 }
 
+void print_string(char* str) {
+    unsigned int string_position = 0;
+    unsigned int buffer_position = 0;
+
+    while(str[string_position] != '\0') {
+        char* video_memory = (unsigned char*) VIDEO_MEMORY;
+        video_memory[buffer_position] = (char) str[string_position];
+        video_memory[buffer_position + 1] = WHITE_ON_BLACK;
+        string_position++;
+        buffer_position = buffer_position + 2;
+    }
+}
+
+void kernel_early() {}
+
 int main() {
     clear_screen();
-    print_char('X', SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2, WHITE_ON_BLACK);
+    //print_char('X', 0, 0, WHITE_ON_BLACK);
+    char* str = "Hello World!";
+    print_string(str);
     while (1) {}
 }
 
