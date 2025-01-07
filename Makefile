@@ -1,6 +1,6 @@
 CC = gcc
 TARGET = os
-C_SOURCES = $(wildcard kernel/*.c kernel/src/*.c kernel/src/tty/*.c kernel/src/libc/*.c)
+C_SOURCES = $(wildcard kernel/*.c kernel/src/*.c kernel/src/tty/*.c kernel/src/libc/*.c kernel/src/io/*.c)
 OBJS = ${C_SOURCES:.c=.o}
 C_FLAGS = -m32 -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -fno-pie
 

@@ -69,10 +69,12 @@ void terminal_putchar(char c) {
             terminal_scroll();
         }
         return;
-    } else if (c == '\t') {
+    }
+    if (c == '\t') {
         terminal_col += 4;
         return;
-    } else if (c == '\b') {
+    }
+    if (c == '\b') {
         terminal_putentryat(' ', terminal_color, terminal_col--, terminal_row);
         terminal_putentryat(' ', terminal_color, terminal_col, terminal_row);
         return;
