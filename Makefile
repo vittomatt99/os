@@ -19,21 +19,21 @@ run-iso: iso
 # Build floppy binary
 floppy: $(TARGET)
 
-$(TARGET): boot/boot_sect.bin kernel/kernel.bin-floppy
-	cat boot/boot_sect.bin kernel/kernel.bin-floppy > $(TARGET)
+$(TARGET): boot/boot_sect.bin kernel/kernel-floppy.bin
+	cat $^ > $(TARGET)
 
-kernel/kernel.bin-floppy: kernel/kernel_entry.o ${OBJS}
+kernel/kernel-floppy.bin: kernel/kernel_entry.o ${OBJS}
 	ld -m elf_i386 -Ttext 0x1000 $^ --oformat binary -o $@
 
 # Build ISO
 iso: $(TARGET).iso
 
-$(TARGET).iso: kernel/kernel.bin-iso
-	cp kernel/kernel.bin-iso ./iso/boot/$(TARGET)
+$(TARGET).iso: kernel/kernel-iso.bin
+	cp $< ./iso/boot/$(TARGET)
 	grub-mkrescue iso --output=$(TARGET).iso
 	rm -f ./iso/boot/$(TARGET)
 
-kernel/kernel.bin-iso: kernel/kernel_entry.o ${OBJS}
+kernel/kernel-iso.bin: kernel/kernel_entry.o ${OBJS}
 	ld -m elf_i386 -T boot/linker/linker.ld $^ -o $@
 
 # Object files for C source files
