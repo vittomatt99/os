@@ -1,6 +1,6 @@
 [bits 32]
 global _start
-;extern kernel_early
+extern kernel_early
 extern main
 
 section .text
@@ -12,8 +12,8 @@ dd - (0x1BADB002 + 0x00) ; checksum
 _start:
     cli
     mov esp, stack
+    call kernel_early
     call main
-    ;call kernel_early
     hlt
 
 section .bss
