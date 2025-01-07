@@ -1,9 +1,8 @@
 CC = gcc
 TARGET = os
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
-C_FLAGS = -m32 -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -fno-pie
-HEADERS = $(wildcard kernel/*.h drivers/*.h)
+C_SOURCES = $(wildcard kernel/*.c kernel/src/*.c kernel/src/tty/*.c kernel/src/libc/*.c)
 OBJS = ${C_SOURCES:.c=.o}
+C_FLAGS = -m32 -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -fno-pie
 
 # Build all
 all: floppy iso
@@ -37,7 +36,7 @@ kernel/kernel-iso.bin: kernel/kernel_entry.o ${OBJS}
 	ld -m elf_i386 -T boot/linker/linker.ld $^ -o $@
 
 # Object files for C source files
-%.o: %.c ${HEADERS}
+%.o: %.c
 	$(CC) $(C_FLAGS) -T boot/linker/linker.ld -c $< -o $@
 
 # Object files for assembly files
@@ -49,6 +48,6 @@ kernel/kernel-iso.bin: kernel/kernel_entry.o ${OBJS}
 	nasm $< -f bin -o $@
 
 clean:
-	rm -fr *.bin *.o
+	find . -name \*.o | xargs --no-run-if-empty rm
+	find . -name \*.bin | xargs --no-run-if-empty rm
 	rm -fr $(TARGET) $(TARGET).iso iso/boot/$(TARGET)
-	rm -fr kernel/*.o kernel/*.bin boot/*.bin drivers/*.o
